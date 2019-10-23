@@ -16,22 +16,22 @@
 # o arquivo dtb_2010(MG).csv fornece os nomes e codigos das 
 # mesmas.
 # 
-# Ultima versao: 16/10/2019
+# Ultima versao: 22/10/2019
 # ------------------------------------------------------------ #
 
 source("functions/autocor.r")
 
-MGSHP = readOGR(dsn = 'areas' , layer = "MGSHP")
-MGSHP = MGSHP[order(MGSHP$CD_GEOCMU),] # ordenar a malha pelo codigo do municipio
+MGSHP = readOGR(dsn = "areas" , layer = "31MUE250GC_SIR")
+MGSHP = MGSHP[order(MGSHP$CD_GEOCODM),] # ordenar a malha pelo codigo do municipio
 
 mNB = poly2nb(MGSHP) # lista de vizinhancas
 
 ## ----- Importando as malhas digitais ----- ##
 
 # importando o shp para as mesorregioes
-MG_MESO = readOGR(dsn = "areas", layer = "MG_MESO")
-MG_MESO = MG_MESO[order(MG_MESO$CD_GEOCME),] # ordenar a malha pelo codigo das mesorregioes
-mTract_meso = fortify(MG_MESO, region = "CD_GEOCME")
+MG_MESO = readOGR(dsn = "areas", layer = "31MEE250GC_SIR")
+MG_MESO = MG_MESO[order(MG_MESO$CD_GEOCODU),] # ordenar a malha pelo codigo das mesorregioes
+mTract_meso = fortify(MG_MESO, region = "ID")
 
 # Objeto ggplot para a malha de mesorregioes
 plot_meso = geom_polygon(data = mTract_meso, 
@@ -69,6 +69,8 @@ variaveis = list(IDHM = var.info(df$idhm,'idhm', 'IDHM', 'Blues', idhmInt),
                  Frequencia = var.info(df$frequencia, 'frequencia', 'Taxa de frequencia de matricula', 'Purples', quantileInt))
 
 resultados = lapply(variaveis, function(X){
- moran.autocor(MGSHP, 'CD_GEOCMU', X, ggadd = plot_meso, width = 6, mNB = mNB)
+ moran.autocor(MGSHP, 'CD_GEOCODM', X, ggadd = plot_meso, width = 6, mNB = mNB)
  })
+
+moran.autocor(MGSHP, 'CD_GEOCODM', variaveis$IDHM, ggadd = plot_meso, width = 6, mNB = mNB)
 
