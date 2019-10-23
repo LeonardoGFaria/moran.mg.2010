@@ -12,7 +12,7 @@
 # Os codigos sao baseados naqueles utilizados pelo professor 
 # na disciplina de Introducao a Estatistica Espacial em 2018-2.
 # 
-# Ultima versao: 16/10/2019
+# Ultima versao: 22/10/2019
 # ------------------------------------------------------------ #
 
 library(dplyr)
@@ -22,7 +22,7 @@ library(spdep)
 library(Cairo)
 
 # shp: variavel contendo o objeto do tipo SpatialPolygonsDataFrame
-# id.varb: atributo de identificacao individual de cada poligono
+# poly.id.name: atributo de identificacao individual de cada poligono
 # data: uma lista com os dados que deve conter os seguintes itens:
     # varb: a variavel analisada
     # varname: o nome da variavel com que os graficos serao salvos. 
@@ -38,10 +38,11 @@ library(Cairo)
 #
 # retorno: lista com o teste de I global de Moran e I locais
 
-moran.autocor = function(shp, id.varb = 'id', data, matrix.mode = 'W', mNB = NULL, sign.lvl = .05, width = 5, height = 4.5, ggadd = NULL){
+moran.autocor = function(shp, poly.id.name = 'id', data, matrix.mode = 'W', mNB = NULL, sign.lvl = .05, 
+                         width = 5, height = 4.5, ggadd = NULL){
   # ggplot2 gera mapas mais facilmente se o SpatialPolygonsDataFrame for
   # convertido em um dataframe. A funcao fortify faz isso.
-  mTract = fortify(shp, region = id.varb)
+  mTract = fortify(shp, region = poly.id.name)
   mTract$id = as.character(mTract$id)
   if(is.null(mNB))
     mNB = poly2nb(shp) #gera uma lista de vizinhancas
@@ -54,7 +55,7 @@ moran.autocor = function(shp, id.varb = 'id', data, matrix.mode = 'W', mNB = NUL
   varcolor = data$varcolor
   varb = data$varb
   
-  id = unique(mTract$id)
+  id = as.character(sort(as.integer(unique(mTract$id))))
   
   # ----- Mapa Tematico ----- #
   
